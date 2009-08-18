@@ -1,5 +1,25 @@
 package acse.oneDim.gui;
 
+/*
+Program: AcSE - AcSE calculates the Schrödinger Equation
+This Software provides the possibility to easily create your own quantum-mechanical simulations.
+
+Copyright (C) 2009  Steffen Roland
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import java.io.*;
 import com.sun.opengl.util.Animator;
 import com.sun.opengl.util.BufferUtil;
@@ -23,48 +43,56 @@ import acse.oneDim.interfaces.*;
 import acse.oneDim.potentials.*;
 import acse.oneDim.solutions.*;
 
+/*
+Stellt die eigentliche Visualisierung dar; Erzeugt dazu ein
+OpenGL-Fenster
+*/
 public class Visu implements GLEventListener, KeyListener {
 
-    private static int xMax;
-    private static int yMax;
-	private static int width;
-	private static double dx;
-	private static double a;
-	private static double b;
-    private static boolean isReady=false;
-    private boolean pot=true;
-    private boolean ana=true;
+    private static int xMax;	/*Anzahl Gitterpunkte*/
+    private static int height;	/*Höhe des Simulationsfensters*/
+	private static int width;	/*Breite des Simulationsfensters*/
+	private static double dx;	/*Abstand Gitterpunkte*/
+	private static double a;	/*linker Rand der Simulationsbox*/
+	private static double b;	/*rechter Rand der Simulationsbox*/
+	
+	/*Anzeige-Option, können live umgeschaltet werden*/
+    private boolean showPot=true;
+    private boolean showAna=true;
     private boolean showCn=true;
     private boolean showAcv=true;
     private boolean showDiff=false;
     private boolean showEqAcv=false;
     private boolean showEqCn=false;
-	private boolean makeScreenshot=false;
-	private static String sep = System.getProperty("file.separator");
-    private static String potential;
-    private static String initial;
-    private static String printFile;
-    private static boolean isSolution=false;
-	private static boolean makePlot=false;
-    private static boolean Cn=true;
-    private static boolean Acv=true;
-	private static int makeScreens;
-	private static boolean makePause=false;
-	private static boolean logarithmic=false;
-	private static boolean showCoord=true;
-    private static File outFile;
-    private static PrintWriter pWriter;
-	private static double oldTime=0.0;
+	private boolean showCoord=true;
+	private boolean makeScreenshot=false; /*einzelner Screenshot*/
+	private boolean makePause=false;
+	private boolean logarithmic=false;
+	
+	/*vorher eingestellte Simulations-Optionen*/
+    private boolean isSolution=false;
+	private boolean makePlot=false;
+    private boolean Cn=true;
+    private boolean Acv=true;
+	private int makeScreens; /*automatische Screenshots*/
+	
+	/*Die übergebenen Algorithmus-Objekte*/
 	private AskarCakmakVisscher1D mySimAcv;
 	private CrankNicholson1D mySimCn;
+
+	/*Hilfsvariablen*/
+    private File outFile;			/*Datei für die Speicherung der Normierungsdaten*/
+    private String printFile;		/*Pfad zur Gnuplot-Skript-Datei*/
+    private PrintWriter pWriter;
+	private String sep = System.getProperty("file.separator");
 	
 	public Visu(AskarCakmakVisscher1D myAcv, CrankNicholson1D myCn,
-				int xMax, int yMax, double a, double b, double dx,
+				int xMax, int height, double a, double b, double dx,
 				boolean Cn, boolean Acv, boolean makePlot, int makeScreens) {
 		this.Cn=Cn;
         this.Acv=Acv;
 		this.xMax=xMax;
-		this.yMax=yMax;
+		this.height=height;
 		this.width=750;
 		this.a=a;
 		this.b=b;
@@ -96,7 +124,7 @@ public class Visu implements GLEventListener, KeyListener {
         canvas.addGLEventListener(this);
 		canvas.addKeyListener(this);
         frame.add(canvas);
-        frame.setSize(width, yMax);
+        frame.setSize(width, height);
         final Animator animator = new Animator(canvas);		
         frame.addWindowListener(new WindowAdapter() {
 
@@ -147,7 +175,7 @@ public class Visu implements GLEventListener, KeyListener {
 		//y-Achse bei x=0 zeichnen
 		gl.glColor3f(0.8f, 0.8f, 0.8f);
 		gl.glVertex2i(xMax/2,0);
-		gl.glVertex2i(xMax/2,yMax);
+		gl.glVertex2i(xMax/2,height);
 		
 		//x-Achse bei y=0 zeichnen
 		gl.glVertex2i(0,10);
@@ -156,42 +184,42 @@ public class Visu implements GLEventListener, KeyListener {
 		/*Markierungen an der y-Achse zeichnen*/
 		if(logarithmic) {
 			//Markierung bei y=0.2 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.3*Math.log(201)/Math.log(10)*yMax));
-			gl.glVertex2i(width/2+10,10+(int)(0.3*Math.log(201)/Math.log(10)*yMax));	
+			gl.glVertex2i(width/2-10,10+(int)(0.3*Math.log(201)/Math.log(10)*height));
+			gl.glVertex2i(width/2+10,10+(int)(0.3*Math.log(201)/Math.log(10)*height));	
 			//Markierung bei y=0.4 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.3*Math.log(401)/Math.log(10)*yMax));
-			gl.glVertex2i(width/2+10,10+(int)(0.3*Math.log(401)/Math.log(10)*yMax));
+			gl.glVertex2i(width/2-10,10+(int)(0.3*Math.log(401)/Math.log(10)*height));
+			gl.glVertex2i(width/2+10,10+(int)(0.3*Math.log(401)/Math.log(10)*height));
 			//Markierung bei y=0.6 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.3*Math.log(601)/Math.log(10)*yMax));
-			gl.glVertex2i(width/2+10,10+(int)(0.3*Math.log(601)/Math.log(10)*yMax));
+			gl.glVertex2i(width/2-10,10+(int)(0.3*Math.log(601)/Math.log(10)*height));
+			gl.glVertex2i(width/2+10,10+(int)(0.3*Math.log(601)/Math.log(10)*height));
 			//Markierung bei y=0.8 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.3*Math.log(801)/Math.log(10)*yMax));
-			gl.glVertex2i(width/2+10,10+(int)(0.3*Math.log(801)/Math.log(10)*yMax));
+			gl.glVertex2i(width/2-10,10+(int)(0.3*Math.log(801)/Math.log(10)*height));
+			gl.glVertex2i(width/2+10,10+(int)(0.3*Math.log(801)/Math.log(10)*height));
 		}
 		else {
 			//Markierung bei y=0.2 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.2*yMax));
-			gl.glVertex2i(width/2+10,10+(int)(0.2*yMax));	
+			gl.glVertex2i(width/2-10,10+(int)(0.2*height));
+			gl.glVertex2i(width/2+10,10+(int)(0.2*height));	
 			//Markierung bei y=0.4 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.4*yMax));
-			gl.glVertex2i(width/2+10,10+(int)(0.4*yMax));
+			gl.glVertex2i(width/2-10,10+(int)(0.4*height));
+			gl.glVertex2i(width/2+10,10+(int)(0.4*height));
 			//Markierung bei y=0.6 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.6*yMax));
-			gl.glVertex2i(width/2+10,10+(int)(0.6*yMax));
+			gl.glVertex2i(width/2-10,10+(int)(0.6*height));
+			gl.glVertex2i(width/2+10,10+(int)(0.6*height));
 			//Markierung bei y=0.8 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.8*yMax));
-			gl.glVertex2i(width/2+10,10+(int)(0.8*yMax));
+			gl.glVertex2i(width/2-10,10+(int)(0.8*height));
+			gl.glVertex2i(width/2+10,10+(int)(0.8*height));
 		}
 	}
 
     public void display(GLAutoDrawable drawable) {
         /*Erstellen der Zeichenumgebung und des Koordinatensystems*/
-        /*(0,0) unten links, (xMax, yMax) oben rechts)*/
+        /*(0,0) unten links, (xMax, height) oben rechts)*/
         GL gl = drawable.getGL();
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glMatrixMode(GL.GL_PROJECTION);
         gl.glLoadIdentity();
-        gl.glOrtho(-0.5, xMax-0.5, -0.5, yMax-0.5, -1, 1);
+        gl.glOrtho(-0.5, xMax-0.5, -0.5, height-0.5, -1, 1);
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glLoadIdentity();
 		
@@ -219,7 +247,7 @@ public class Visu implements GLEventListener, KeyListener {
 			xxPx=(int)((x+dx)/dx+xMax/2);
 					
             //Potential zeichhnen (grün)
-            if(pot){
+            if(showPot){
                 gl.glColor3f(0.3f, 0.5f, 0.3f);
                 gl.glVertex2i(xPx,(int)(mySimAcv.getPotential(x))+10);
                 gl.glVertex2i(xxPx,(int)(mySimAcv.getPotential(x+dx))+10);
@@ -239,10 +267,10 @@ public class Visu implements GLEventListener, KeyListener {
 					tmpAna1=0.3*Math.log(tmpAna1*1000+1)/Math.log(10);
 					tmpAna2=0.3*Math.log(tmpAna2*1000+1)/Math.log(10);
 				}
-				if(ana) {
+				if(showAna) {
 					gl.glColor3f(0.0f, 0.0f, 1.0f);
-					gl.glVertex2i(xPx,(int)(tmpAna1*yMax)+10);
-					gl.glVertex2i(xxPx,(int)(tmpAna2*yMax)+10);
+					gl.glVertex2i(xPx,(int)(tmpAna1*height)+10);
+					gl.glVertex2i(xxPx,(int)(tmpAna2*height)+10);
 				}
             }
 			
@@ -260,8 +288,8 @@ public class Visu implements GLEventListener, KeyListener {
 				}
 				if(showAcv) {
 					gl.glColor3f(1.0f, 0.0f, 0.0f);
-					gl.glVertex2i(xPx,(int)(tmpAcv1*yMax)+10);
-					gl.glVertex2i(xxPx,(int)(tmpAcv2*yMax)+10);
+					gl.glVertex2i(xPx,(int)(tmpAcv1*height)+10);
+					gl.glVertex2i(xxPx,(int)(tmpAcv2*height)+10);
 				}
             }
 
@@ -277,22 +305,22 @@ public class Visu implements GLEventListener, KeyListener {
 				}
 				if(showCn) {
 					gl.glColor3f(1.0f, 0.0f, 1.0f);
-					gl.glVertex2i(xPx,(int)(tmpCn1*yMax)+10);
-					gl.glVertex2i(xxPx,(int)(tmpCn2*yMax)+10);
+					gl.glVertex2i(xPx,(int)(tmpCn1*height)+10);
+					gl.glVertex2i(xxPx,(int)(tmpCn2*height)+10);
 				}
             }
 
             //Differenz der beiden Algorithmen zeichnen
             if(showDiff) {
                 gl.glColor3f(0.0f, 0.0f, 0.0f);
-                gl.glVertex2i(xPx,(int)(Math.sqrt((tmpCn1-tmpAcv1)*(tmpCn1-tmpAcv1))*yMax+10));
-                gl.glVertex2i(xxPx,(int)(Math.sqrt((tmpCn2-tmpAcv2)*(tmpCn2-tmpAcv2))*yMax+10));
+                gl.glVertex2i(xPx,(int)(Math.sqrt((tmpCn1-tmpAcv1)*(tmpCn1-tmpAcv1))*height+10));
+                gl.glVertex2i(xxPx,(int)(Math.sqrt((tmpCn2-tmpAcv2)*(tmpCn2-tmpAcv2))*height+10));
             }
 
             //Differenz zur analytischen Lösung (Acv)
             if(showEqAcv) {
-                tmpDiff1 = Math.sqrt(Math.pow(tmpAcv1-tmpAna1,2))*yMax;
-                tmpDiff2 = Math.sqrt(Math.pow(tmpAcv2-tmpAna2,2))*yMax;
+                tmpDiff1 = Math.sqrt(Math.pow(tmpAcv1-tmpAna1,2))*height;
+                tmpDiff2 = Math.sqrt(Math.pow(tmpAcv2-tmpAna2,2))*height;
                 gl.glColor3f(1.0f, 0.0f, 0.0f);
                 gl.glVertex2i(xPx,(int)(tmpDiff1)+10);
                 gl.glVertex2i(xxPx,(int)(tmpDiff2)+10);
@@ -300,8 +328,8 @@ public class Visu implements GLEventListener, KeyListener {
 
             //Differenz zur analytischen Lösung (Cn)
             if(showEqCn) {
-                tmpDiff1 = Math.sqrt(Math.pow(tmpCn1-tmpAna1,2))*yMax;
-                tmpDiff2 = Math.sqrt(Math.pow(tmpCn2-tmpAna2,2))*yMax;
+                tmpDiff1 = Math.sqrt(Math.pow(tmpCn1-tmpAna1,2))*height;
+                tmpDiff2 = Math.sqrt(Math.pow(tmpCn2-tmpAna2,2))*height;
                 gl.glColor3f(1.0f, 0.0f, 1.0f);
                 gl.glVertex2i(xPx,(int)(tmpDiff1)+10);
                 gl.glVertex2i(xxPx,(int)(tmpDiff2)+10);
@@ -318,7 +346,7 @@ public class Visu implements GLEventListener, KeyListener {
 				String path = System.getProperty("user.dir");
 				if(Acv) path=path+sep+"acse"+sep+"screens"+sep+mySimAcv.getPotential()+"_"+mySimAcv.getInitial()+"_"+mySimAcv.getSteps()+".png";
 				else path=path+sep+"acse"+sep+"screens"+sep+mySimCn.getPotential()+"_"+mySimCn.getInitial()+"_"+mySimCn.getSteps()+".png";
-				Screenshot.writeToFile(new File(path),xMax-20,yMax-50);
+				Screenshot.writeToFile(new File(path),xMax-20,height-50);
 				System.out.println("Screenshot in "+path+" gespeichert!");
 			} catch(Exception e) {
 				System.out.println("Fehler beim Screenshot!");
@@ -366,8 +394,8 @@ public class Visu implements GLEventListener, KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         char c=e.getKeyChar();
-        if(c=='p') pot=!pot;
-        if(c=='a' && mySimAcv.getHasSolution()) ana=!ana;
+        if(c=='p') showPot=!showPot;
+        if(c=='a' && mySimAcv.getHasSolution()) showAna=!showAna;
         if(c=='c' && Cn) showCn=!showCn;
         if(c=='v' && Acv) showAcv=!showAcv;
         if(c=='d' && Acv && Cn) showDiff=!showDiff;

@@ -1,5 +1,25 @@
 package acse;
 
+/*
+Program: AcSE - AcSE calculates the Schrödinger Equation
+This Software provides the possibility to easily create your own quantum-mechanical simulations.
+
+Copyright (C) 2009  Steffen Roland
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -8,10 +28,13 @@ import acse.oneDim.gui.*;
 
 public class Acse extends JPanel {
     public Acse() {
+		/*Erzeugt tabelleförmiges Layout*/
         super(new GridLayout(1, 1));
         
+		/*Hauptfenster*/
         JTabbedPane tabbedPane = new JTabbedPane();
         
+		/*Erzeugt die Panels für die einzelnen Simulationsszenarien*/
 		JComponent panelOneDim = new acse.oneDim.gui.MainPanel();
 		panelOneDim.setPreferredSize(new Dimension(400, 450));
         tabbedPane.addTab("1D, 1 Teilchen", null, panelOneDim,"eindimensionale SGL");
@@ -25,31 +48,22 @@ public class Acse extends JPanel {
         tabbedPane.addTab("1D, 2 Teilchen", null, panelTwoPart,"zwei Teilchen SGL");
         tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
                
-        //Add the tabbed pane to this panel.
+        /*Fügt die Reiter-Struktur dem Hauptfenster hinzu*/
         add(tabbedPane);
         
-        //The following line enables to use scrolling tabs.
+        /*Reiter-Scrolling wird ermöglicht*/
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-    }
-    
-    protected JComponent makeTextPanel(String text) {
-        JPanel panel = new JPanel(false);
-        JLabel filler = new JLabel(text);
-        filler.setHorizontalAlignment(JLabel.CENTER);
-        panel.setLayout(new GridLayout(1, 1));
-        panel.add(filler);
-        return panel;
     }
        
     private static void createAndShowGUI() {
-        //Create and set up the window.
+        /*Erstellt das eigentliche Fenster*/
         JFrame frame = new JFrame("AcSE calculates the Schroedinger Equation");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        //Add content to the window.
+        /*fügt dem Fenster eine Instanz dieser Klasse hinzu (Reiter-Struktur)*/
         frame.add(new Acse(), BorderLayout.CENTER);
         
-        //Display the window.
+        /*Fenster wird angezeigt im linken oberen Bildschirm-Eck*/
         frame.pack();
 		frame.setLocation(0, 0);
         frame.setVisible(true);
