@@ -27,7 +27,7 @@ dieses ist angepasst auf die Simulationen im Zuge der Bachelorarbeit
 public class Constants {
     public double h;		/*reduziertes planchksches Wirkungsquantum*/
     public double m;		/*Masse des simulierten Teilchens*/
-    public double k;		/*Impuls des Teilchens*/
+    public double k;		/*'Federkonstante'*/
     public double w;		/*Kreisfrequenz eines dazu passenden harmonischen Oszillators*/
     public double x0;		/*(mittlerer) Startort des Teilchens*/
     public double sig;		/*Zum harmonischen Oszillator passende Breite eine Gaußpakets*/
