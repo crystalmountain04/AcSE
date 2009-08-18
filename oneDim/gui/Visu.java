@@ -70,11 +70,11 @@ public class Visu implements GLEventListener, KeyListener {
 	private boolean logarithmic=false;
 	
 	/*vorher eingestellte Simulations-Optionen*/
-    private boolean isSolution=false;
-	private boolean makePlot=false;
-    private boolean Cn=true;
-    private boolean Acv=true;
-	private int makeScreens; /*automatische Screenshots*/
+    private boolean isSolution=false;	/*Ist analytische Lösung angegeben?*/
+	private boolean makePlot=false;		/*Soll Normierung geplottet werden*/
+    private boolean Cn=true;			/*Crank-Nicolson berechnen?*/
+    private boolean Acv=true;			/*Askar-Cakmak-Visscher berechnen?*/
+	private int makeScreens; 			/*Abstand zwischen automatischen Screenshots, 0 für nicht*/
 	
 	/*Die übergebenen Algorithmus-Objekte*/
 	private AskarCakmakVisscher1D mySimAcv;
@@ -85,7 +85,7 @@ public class Visu implements GLEventListener, KeyListener {
     private String printFile;		/*Pfad zur Gnuplot-Skript-Datei*/
     private PrintWriter pWriter;
 	private String sep = System.getProperty("file.separator");
-	
+
 	public Visu(AskarCakmakVisscher1D myAcv, CrankNicholson1D myCn,
 				int xMax, int height, double a, double b, double dx,
 				boolean Cn, boolean Acv, boolean makePlot, int makeScreens) {
@@ -102,10 +102,14 @@ public class Visu implements GLEventListener, KeyListener {
 		this.mySimAcv=myAcv;
 		this.mySimCn=myCn;
 		
+		/*Initialisierung des Dateipfads für das gnuplot-skript*/
 		String path = System.getProperty("user.dir");
         printFile=path+sep+"oneDim"+sep+"plotBoth.g";
 
+		/*Ausgabe der verfügbaren Befehlstasten auf der Konsole*/
 		printHelp();
+		
+		/*Initialisierung der Datei zum Schreiben der Normierungsdaten*/
 		try {
 			outFile = new java.io.File( "data.dat" );
 			pWriter = new PrintWriter(new java.io.FileOutputStream(outFile), true);
@@ -117,21 +121,19 @@ public class Visu implements GLEventListener, KeyListener {
 		start();
 	}
 	
+	/*Erzeugt OpenGL-Simulationsfenster*/
 	public void start() {
 		final Frame frame = new Frame("Visualisierung Schr\u00f6dingergleichung in 1D");
         GLCanvas canvas = new GLCanvas();
-		
         canvas.addGLEventListener(this);
 		canvas.addKeyListener(this);
         frame.add(canvas);
         frame.setSize(width, height);
         final Animator animator = new Animator(canvas);		
         frame.addWindowListener(new WindowAdapter() {
-
             @Override
             public void windowClosing(WindowEvent e) {
                 new Thread(new Runnable() {
-
                     public void run() {
                         animator.stop();
                         pWriter.close();
@@ -141,12 +143,12 @@ public class Visu implements GLEventListener, KeyListener {
                 }).start();
             }
         });
-        // Center frame
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         animator.start();
 	}
 
+	/*Initialisierung des OpenGL-Bereichs*/
     public void init(GLAutoDrawable drawable) {
         GL gl = drawable.getGL();
         gl.setSwapInterval(1);
@@ -154,12 +156,12 @@ public class Visu implements GLEventListener, KeyListener {
         gl.glShadeModel(GL.GL_SMOOTH);
     }
 
+	/*Verarbeitet Größenänderungen des Simulationsfensters*/
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         GL gl = drawable.getGL();
         GLU glu = new GLU();
 
-        if (height <= 0) { // avoid a divide by zero error!
-        
+        if (height <= 0) {
             height = 1;
         }
         final float h = (float) width / (float) height;
@@ -171,6 +173,7 @@ public class Visu implements GLEventListener, KeyListener {
         gl.glLoadIdentity();
     }
 	
+	/*Zeichnet ein rudimentäres Koordinatensystem*/
 	public void drawCoordSys(GL gl) {
 		//y-Achse bei x=0 zeichnen
 		gl.glColor3f(0.8f, 0.8f, 0.8f);
@@ -212,9 +215,12 @@ public class Visu implements GLEventListener, KeyListener {
 		}
 	}
 
+	/*Wird nach jedem Zeitschritt aufgerufen und zeichnet alle sichtbaren Elemente*/
     public void display(GLAutoDrawable drawable) {
-        /*Erstellen der Zeichenumgebung und des Koordinatensystems*/
-        /*(0,0) unten links, (xMax, height) oben rechts)*/
+        /*
+		Erstellen der Zeichenumgebung und des Koordinatensystems
+        (0,0) unten links, (xMax, height) oben rechts)
+		*/
         GL gl = drawable.getGL();
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glMatrixMode(GL.GL_PROJECTION);
@@ -223,26 +229,29 @@ public class Visu implements GLEventListener, KeyListener {
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glLoadIdentity();
 		
-		double x=a;
-		int xPx=0;
-		int xxPx=0;
+		double x=a; 	/*x beginnt am linken Rand der Simulationsbox*/
+		int xPx=0;		/*x in Pixeln*/
+		int xxPx=0;		/*x+dx in Pixeln*/
 	
-	    gl.glLineWidth(2.0f);
+	    gl.glLineWidth(2.0f); /*Liniendicke*/
         gl.glBegin(GL.GL_LINES);
 		
+		/*Koordinatensystem zeichnen*/
 		if(showCoord) drawCoordSys(gl);
 		
-        int i;
-        double tmpAcv1=0.0;
-        double tmpAcv2=0.0;
-        double tmpCn1=0.0;
-        double tmpCn2=0.0;
-        double tmpDiff1=0.0;
-        double tmpDiff2=0.0;
-		double tmpAna1=0.0;
-		double tmpAna2=0.0;
+        int i; 					/*räumlicher Index x=a+i*dx*/
+        double tmpAcv1=0.0;		/*Wert des Wellenfunktionsbetragsquadrats mit AskarCakmakVisscher*/
+        double tmpAcv2=0.0;		/*Wert einen räumlichen Schritt weiter*/
+        double tmpCn1=0.0;		/*Wert des Wellenfunktionsbetragsquadrats mit CrankNicolson*/
+        double tmpCn2=0.0;		/*Wert einen räumlichen Schritt weiter*/
+        double tmpDiff1=0.0;	/*Differenz der beiden Algorithmen*/
+        double tmpDiff2=0.0;	/*Differenz am jeweils nächsten Ortsschritt*/
+		double tmpAna1=0.0;		/*analytischer Wert des Wellenfunktionsbetragsquadrats*/
+		double tmpAna2=0.0;		/*analytischer Wert räumlicher Schritt weiter*/
 
+		/*durchläuft die Simulationsbox*/
         for (i=0;i<xMax-1;i++) {
+			/*Berechnen der Pixelkoordinaten*/
 			xPx=(int)(x/dx+xMax/2);
 			xxPx=(int)((x+dx)/dx+xMax/2);
 					
@@ -263,6 +272,7 @@ public class Visu implements GLEventListener, KeyListener {
 					tmpAna1=mySimCn.getAnalyticState(x);
 					tmpAna2=mySimCn.getAnalyticState(x+dx);
 				}
+				/*unter Umständen: logarithmische Skalierung*/
 				if(logarithmic) {
 					tmpAna1=0.3*Math.log(tmpAna1*1000+1)/Math.log(10);
 					tmpAna2=0.3*Math.log(tmpAna2*1000+1)/Math.log(10);
@@ -273,11 +283,10 @@ public class Visu implements GLEventListener, KeyListener {
 					gl.glVertex2i(xxPx,(int)(tmpAna2*height)+10);
 				}
             }
-			
-			if(x==0) System.out.println(xPx);
 
             //AskarCakmakVisscher-Lösung zeichnen
             if(Acv) {
+				/*unter Umständen: logarithmische Skalierung*/
 				if(logarithmic) {
 					tmpAcv1=0.3*Math.log(mySimAcv.getState(x)*1000+1)/Math.log(10);
 					tmpAcv2=0.3*Math.log(mySimAcv.getState(x+dx)*1000+1)/Math.log(10);
@@ -295,6 +304,7 @@ public class Visu implements GLEventListener, KeyListener {
 
             //CrankNicolson-Lösung zeichnen
             if(Cn) {
+				/*unter Umständen: logarithmische Skalierung*/
 				if(logarithmic) {
 					tmpCn1=0.3*Math.log(mySimCn.getState(x)*1000+1)/Math.log(10);
 					tmpCn2=0.3*Math.log(mySimCn.getState(x+dx)*1000+1)/Math.log(10);
@@ -334,6 +344,7 @@ public class Visu implements GLEventListener, KeyListener {
                 gl.glVertex2i(xPx,(int)(tmpDiff1)+10);
                 gl.glVertex2i(xxPx,(int)(tmpDiff2)+10);
             }
+			//räumlicher Schritt
 			x+=dx;
         }
 		
@@ -356,29 +367,27 @@ public class Visu implements GLEventListener, KeyListener {
 		}
 
         /*Schreiben der Normierung in die Plot-Datei*/
-        if(Acv) {
-            if(mySimAcv.getSteps()%100==0) {
-                pWriter.print(mySimAcv.getSteps()+"\t");
-                pWriter.print((1-mySimCn.getNorm())*100000000.0+"\t");
-                pWriter.print((1-mySimAcv.getNorm())*100000000.0+"\n");
-            }
-        }
-        else {
-            if(mySimCn.getSteps()%100==0) {
-                pWriter.print(mySimCn.getSteps()+"\t");
-                pWriter.print((1-mySimCn.getNorm())*100000000.0+"\t");
-                pWriter.print((1-mySimAcv.getNorm())*100000000.0+"\n");
-            }
-        }
+		if(makePlot) {
+			if(Acv) {
+				if(mySimAcv.getSteps()%100==0) {
+					pWriter.print(mySimAcv.getSteps()+"\t");
+					pWriter.print((1-mySimCn.getNorm())*100000000.0+"\t");
+					pWriter.print((1-mySimAcv.getNorm())*100000000.0+"\n");
+				}
+			}
+			else {
+				if(mySimCn.getSteps()%100==0) {
+					pWriter.print(mySimCn.getSteps()+"\t");
+					pWriter.print((1-mySimCn.getNorm())*100000000.0+"\t");
+					pWriter.print((1-mySimAcv.getNorm())*100000000.0+"\n");
+				}
+			}
+		}
 		
-		//evtl. Simulation pausieren
+		//nächster Zeitschritt, falls Simulation nicht pausiert ist
 		if(!makePause) {
-			//oldTime=System.currentTimeMillis();
 			if(Acv) mySimAcv.nextTimeStep();
-			//System.out.println("Acv: "+(System.currentTimeMillis()-oldTime)+" ms");
-			//oldTime=System.currentTimeMillis();
 			if(Cn) mySimCn.nextTimeStep();
-			//System.out.println("Cn : "+(System.currentTimeMillis()-oldTime)+" ms");
 		}
 		
         gl.glFlush();
@@ -392,6 +401,7 @@ public class Visu implements GLEventListener, KeyListener {
     }
 	
     @Override
+	/*Verarbeitet die Tastatureingaben und passt die Anzeigeparameter entsprechend an*/
     public void keyPressed(KeyEvent e) {
         char c=e.getKeyChar();
         if(c=='p') showPot=!showPot;
@@ -411,6 +421,10 @@ public class Visu implements GLEventListener, KeyListener {
     public void keyReleased(KeyEvent e) {
     }
 	
+	/*
+	Plottet die Normierung der Wellenfunktion in eine Datei und auf dem Bildschirm;
+	Hierfür wird die OpenSource-Software Gnuplot benötigt
+	*/
     public void plotNorm() {
 		String path = System.getProperty("user.dir");
         System.out.println("Plotte Normierung des Wellenpakets in "+path+sep+"Normierung.png");
@@ -422,6 +436,7 @@ public class Visu implements GLEventListener, KeyListener {
         }
     }
 	
+	/*Schreibt die schaltbaren Anzeigeparameter in die Konsole*/
 	public void printHelp() {
 		System.out.println("\n--- verwendbare Befehle im Simulationsfenster ---");
 		System.out.println("p.....Potential an/aus");
