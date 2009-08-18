@@ -218,10 +218,10 @@ public class MainPanel extends JPanel implements ItemListener, ActionListener {
 			int makeScreens=Integer.valueOf(screenField.getText()).intValue();
 			
 			/*Erstellen eines Simulationsobjektes vom ACV-Algorithmus*/
-			AskarCakmakVisscher1D mySimAcv = new AskarCakmakVisscher1D(xMax,yMax,a,b,dx,dt,this.potential,this.initial,this.isSolution);
+			AskarCakmakVisscher1D mySimAcv = new AskarCakmakVisscher1D(xMax,a,b,dx,dt,this.potential,this.initial,this.isSolution);
 			
 			/*Erstellen eines Simulationsobjektes vom CN-Algorithmus*/
-			CrankNicholson1D mySimCn = new CrankNicholson1D(xMax, yMax,a,b,dx,dt,this.potential,this.initial,this.isSolution);
+			CrankNicholson1D mySimCn = new CrankNicholson1D(xMax,a,b,dx,dt,this.potential,this.initial,this.isSolution);
 			
 			/*Erstellen eines Visualisierungsfensters*/
 			Visu simuWindow = new Visu(mySimAcv,mySimCn,xMax,yMax,a,b,dx,calcCn,calcAcv,makePlot,makeScreens);
