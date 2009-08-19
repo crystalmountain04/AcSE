@@ -17,8 +17,10 @@ this.n=0;
 public double getValue(double x, double y) {
 double out=0.0;
 double t = n*dt;
-/*Implementierung des Potentials*/
-out=0.0;return out;
+/*Beginn der Implementierung*/
+out=0.0;
+/*Ende der Implementierung*/
+return out;
 }
 
 public void nextTimeStep() {

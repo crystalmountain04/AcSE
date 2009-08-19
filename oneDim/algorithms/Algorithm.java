@@ -39,9 +39,9 @@ public abstract class Algorithm {
     protected Constants myConst;	/*Konstantenset*/
     protected int n;				/*zeitliche Schrittzahl (t=n*dt)*/
     protected int max;				/*Anzahl Gitterpunkte*/
-    protected Object mySol;
-    protected Object myPot;
-    protected boolean hasSolution=false;
+    protected Object mySol;			/*Objekt für den Anfangszustand*/
+    protected Object myPot;			/*Objekt für das Potential*/
+    protected boolean hasSolution=false;	/*Analytische Lösung?*/
 
     public Algorithm(int max, double a, double b, double dx, double dt, String potential, String initial, boolean isSolution) {
 		this.potential = potential;

@@ -3,12 +3,12 @@ package acse.twoDim.solutions;
 import acse.twoDim.util.*;
 import acse.twoDim.interfaces.Solution;
 
-public class Gauss0 implements Solution {
+public class GaussImpuls implements Solution {
 private Constants myConst;
 private double dt;
 private int n;
 
-public Gauss0(Constants myConst, double dt) {
+public GaussImpuls(Constants myConst, double dt) {
 this.myConst = myConst;
 this.n=0;
 this.dt=dt;
@@ -30,9 +30,10 @@ double real=0.0;
 double imag=0.0;
 double t=n*dt;
 /*Beginn der Implementierung*/
-/*Implementierung des Wellenpakets*/
-real=0.8*Math.exp(-x*x-y*y);
-imag=0;
+double x0=4;
+double y0=0;
+real=0.8*Math.exp(-(x-x0)*(x-x0)-(y-y0)*(y-y0))*Math.cos(-10*x);
+imag=0.8*Math.exp(-(x-x0)*(x-x0)-(y-y0)*(y-y0))*Math.sin(-10*x);
 /*Ende der Implementierung*/
 Complex out = new Complex(real,imag);
 return out;

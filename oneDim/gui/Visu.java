@@ -118,6 +118,7 @@ public class Visu implements GLEventListener, KeyListener {
 			pWriter = null;
 		}
         
+		/*Starten der Simulation*/
 		start();
 	}
 	
@@ -152,7 +153,7 @@ public class Visu implements GLEventListener, KeyListener {
     public void init(GLAutoDrawable drawable) {
         GL gl = drawable.getGL();
         gl.setSwapInterval(1);
-        gl.glClearColor(0.95f, 0.95f, 0.95f, 0.0f);
+        gl.glClearColor(0.95f, 0.95f, 0.95f, 0.0f);		/*Hintergrundfarbe*/
         gl.glShadeModel(GL.GL_SMOOTH);
     }
 
@@ -396,9 +397,7 @@ public class Visu implements GLEventListener, KeyListener {
     public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
     }
 	
-    @Override
-    public void keyTyped(KeyEvent e) {
-    }
+
 	
     @Override
 	/*Verarbeitet die Tastatureingaben und passt die Anzeigeparameter entsprechend an*/
@@ -416,7 +415,9 @@ public class Visu implements GLEventListener, KeyListener {
 		if(c=='l') logarithmic=!logarithmic;
 		if(c=='k') showCoord=!showCoord;
     }
-
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
     @Override
     public void keyReleased(KeyEvent e) {
     }
