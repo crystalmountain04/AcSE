@@ -164,7 +164,7 @@ public class MainPanel extends JPanel implements ItemListener, ActionListener {
 		else {
 			/*Erstellen einer Simulation mit den gewünschten Optionen*/
 			int xMax=Integer.valueOf(nField.getText()).intValue();
-			int yMax=700;
+			int height=700;
 			double a=Double.parseDouble(aField.getText());
 			double b=Double.parseDouble(bField.getText());
 			double dx=(b-a)/xMax;
@@ -174,10 +174,10 @@ public class MainPanel extends JPanel implements ItemListener, ActionListener {
 			int makeScreens = Integer.valueOf(screenField.getText()).intValue();
 			
 			/*Erstellen eines Simulationsobjektes vom ACV-Algorithmus*/
-			AskarCakmakVisscher2D mySimAcv = new AskarCakmakVisscher2D(xMax,xMax,yMax,a,b,a,b,dx,dt,m1,m2,this.potential,this.initial,false);
+			AskarCakmakVisscher2D mySimAcv = new AskarCakmakVisscher2D(xMax,xMax,a,b,a,b,dx,dt,m1,m2,this.potential,this.initial);
 			
 			/*Erstellen eines Visualisierungsfensters*/
-			Visu simuWindow = new Visu(mySimAcv,xMax,yMax,a,b,dx,makeScreens);
+			Visu simuWindow = new Visu(mySimAcv,xMax,height,a,b,dx,makeScreens);
 		}
     }
 
