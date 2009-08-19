@@ -84,7 +84,7 @@ public class MainPanel extends JPanel implements ItemListener, ActionListener {
         startButton = new JButton(">>> Simulation starten <<<");
         startButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonActionPerformed(evt);
+                startButtonActionPerformed(evt);
             }
         });
         potButton = new JButton("Potential erstellen");
@@ -166,7 +166,7 @@ public class MainPanel extends JPanel implements ItemListener, ActionListener {
 	}
 
 	/*Ausgeführt beim Klick auf den Startbutton*/
-    private void buttonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {
 		if(this.potential.equals("-- Potential w\u00e4hlen ---") ||
 		   this.initial.equals("-- Anfangszustand w\u00e4hlen ---")) {
 		    /*Fehler ausgeben, falls keine Anfangsbedingungen/Potential gewählt sind*/

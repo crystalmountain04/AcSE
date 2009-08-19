@@ -161,7 +161,6 @@ public class Visu implements GLEventListener, KeyListener {
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         GL gl = drawable.getGL();
         GLU glu = new GLU();
-
         if (height <= 0) {
             height = 1;
         }
@@ -396,8 +395,6 @@ public class Visu implements GLEventListener, KeyListener {
 
     public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
     }
-	
-
 	
     @Override
 	/*Verarbeitet die Tastatureingaben und passt die Anzeigeparameter entsprechend an*/
