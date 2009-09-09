@@ -187,31 +187,31 @@ public class Visu implements GLEventListener, KeyListener {
 		/*Markierungen an der y-Achse zeichnen*/
 		if(logarithmic) {
 			//Markierung bei y=0.2 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.3*Math.log(201)/Math.log(10)*height));
-			gl.glVertex2i(width/2+10,10+(int)(0.3*Math.log(201)/Math.log(10)*height));	
+			gl.glVertex2i(xMax/2-10,10+(int)(0.3*Math.log(201)/Math.log(10)*height));
+			gl.glVertex2i(xMax/2+10,10+(int)(0.3*Math.log(201)/Math.log(10)*height));	
 			//Markierung bei y=0.4 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.3*Math.log(401)/Math.log(10)*height));
-			gl.glVertex2i(width/2+10,10+(int)(0.3*Math.log(401)/Math.log(10)*height));
+			gl.glVertex2i(xMax/2-10,10+(int)(0.3*Math.log(401)/Math.log(10)*height));
+			gl.glVertex2i(xMax/2+10,10+(int)(0.3*Math.log(401)/Math.log(10)*height));
 			//Markierung bei y=0.6 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.3*Math.log(601)/Math.log(10)*height));
-			gl.glVertex2i(width/2+10,10+(int)(0.3*Math.log(601)/Math.log(10)*height));
+			gl.glVertex2i(xMax/2-10,10+(int)(0.3*Math.log(601)/Math.log(10)*height));
+			gl.glVertex2i(xMax/2+10,10+(int)(0.3*Math.log(601)/Math.log(10)*height));
 			//Markierung bei y=0.8 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.3*Math.log(801)/Math.log(10)*height));
-			gl.glVertex2i(width/2+10,10+(int)(0.3*Math.log(801)/Math.log(10)*height));
+			gl.glVertex2i(xMax/2-10,10+(int)(0.3*Math.log(801)/Math.log(10)*height));
+			gl.glVertex2i(xMax/2+10,10+(int)(0.3*Math.log(801)/Math.log(10)*height));
 		}
 		else {
 			//Markierung bei y=0.2 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.2*height));
-			gl.glVertex2i(width/2+10,10+(int)(0.2*height));	
+			gl.glVertex2i(xMax/2-10,10+(int)(0.2*height));
+			gl.glVertex2i(xMax/2+10,10+(int)(0.2*height));	
 			//Markierung bei y=0.4 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.4*height));
-			gl.glVertex2i(width/2+10,10+(int)(0.4*height));
+			gl.glVertex2i(xMax/2-10,10+(int)(0.4*height));
+			gl.glVertex2i(xMax/2+10,10+(int)(0.4*height));
 			//Markierung bei y=0.6 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.6*height));
-			gl.glVertex2i(width/2+10,10+(int)(0.6*height));
+			gl.glVertex2i(xMax/2-10,10+(int)(0.6*height));
+			gl.glVertex2i(xMax/2+10,10+(int)(0.6*height));
 			//Markierung bei y=0.8 zeichnen
-			gl.glVertex2i(width/2-10,10+(int)(0.8*height));
-			gl.glVertex2i(width/2+10,10+(int)(0.8*height));
+			gl.glVertex2i(xMax/2-10,10+(int)(0.8*height));
+			gl.glVertex2i(xMax/2+10,10+(int)(0.8*height));
 		}
 	}
 

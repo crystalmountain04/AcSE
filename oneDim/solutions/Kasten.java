@@ -3,12 +3,12 @@ package acse.oneDim.solutions;
 import acse.oneDim.util.*;
 import acse.oneDim.interfaces.Solution;
 
-public class GaussEigen implements Solution {
+public class Kasten implements Solution {
 private Constants myConst;
 private double dt;
 private int n;
 
-public GaussEigen(Constants myConst, double dt) {
+public Kasten(Constants myConst, double dt) {
 this.myConst = myConst;
 this.n=0;
 this.dt=dt;
@@ -30,10 +30,9 @@ double t = n*dt;
 double real=0.0;
 double imag=0.0;
 /*Beginn der Implementierung*/
-double x0 = -Math.sqrt(7.5);
-double sig = myConst.sig;
-real = Math.pow(1/(2*Math.PI*sig*sig), 0.5)*Math.exp(-(x-x0)*(x-x0)/(2*sig*sig));
-real = Math.sqrt(real);
+/*Implementierung des Wellenpakets*/
+real=0.0;
+if(x>-1&&x<1)real=0.5;
 imag=0;
 /*Ende der Implementierung*/
 
